@@ -36,12 +36,17 @@ const initialData = [
 
 const reviewsContainer = document.querySelector('.reviews__reviewsContainer');
 const reviewInput = document.querySelector('.reviews__input');
+const reviewErrors = document.querySelector('.reviews__errors');
 
 loadInitialData(initialData);
 
 document.querySelector(".reviews__button").addEventListener('click', (e) => {
   handleSubmitReview();
 })
+
+reviewInput.addEventListener('input', (e) => {
+  updateCharCount(e.target.value.length);
+});
 
 function handleSubmitReview() {
   const reviewText = reviewInput.value;
@@ -51,7 +56,19 @@ function handleSubmitReview() {
     addReview(reviewText, getNewReviewId());
     reviewInput.value = '';
   } catch (error) {
-    alert(error.message);
+    showError(error.message);
+  }
+}
+
+function showError(text) {
+  reviewErrors.textContent = text
+}
+
+function updateCharCount(count) {
+  if (count < 50 || count > 500) {
+    reviewErrors.textContent = count
+  } else {
+    reviewErrors.textContent = ''
   }
 }
 
