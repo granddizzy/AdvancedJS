@@ -15,6 +15,9 @@ class Restaurant {
 
   addChef(chefName, dishType) {
     this.validateTypeOfDish(dishType);
+    if (this.chefs.has(dishType)) {
+      throw new Error(`Chef for dish type "${dishType}" already exists`);
+    }
     this.chefs.set(dishType, chefName);
   }
 
@@ -26,6 +29,10 @@ class Restaurant {
     this.validateTypeOfDish(dishType);
     if (!this.dishes.has(dishType)) {
       this.dishes.set(dishType, [])
+    }
+    const dishes = this.dishes.get(dishType);
+    for (const dish of dishes) {
+      if (dish.title === dishTitle) throw new Error(`The "${dishType}" "${dishTitle}" dish is already there`);
     }
     this.dishes.get(dishType).push(new Dish(dishTitle, dishType));
   }
@@ -67,19 +74,15 @@ class Dish {
 class Order {
   constructor(id, client) {
     this.id = id;
-    this.dishes = [];
     this.client = client;
-    this.dishesCount = new Map();
+    this.dishes = new Map();
   }
 
   addItem(dish) {
-    this.dishes.push(dish);
-
-    const key = `${dish.type}-${dish.title}`;
-    if (this.dishesCount.has(key)) {
-      this.dishesCount.set(key, this.dishesCount.get(key) + 1);
+    if (this.dishes.has(dish)) {
+      this.dishes.set(dish, this.dishes.get(dish) + 1);
     } else {
-      this.dishesCount.set(key, 1);
+      this.dishes.set(dish, 1);
     }
   }
 
@@ -87,9 +90,8 @@ class Order {
     console.log(`Заказ №${this.id.description}`);
     console.log(`Клиент ${this.client} заказал:`);
 
-    for (const dish of this.dishes) {
-      const key = `${dish.type}-${dish.title}`;
-      console.log(`(${dish.type}) "${dish.title}" - ${this.dishesCount.get(key)}; Готовит повар ${restaurant.getChefByDishType(dish.type)}`);
+    for (const [dish, count] of this.dishes.entries()) {
+      console.log(`(${dish.type}) - ${dish.title} - ${count}; Готовит повар ${restaurant.getChefByDishType(dish.type)}`);
     }
   }
 }
@@ -139,4 +141,3 @@ order.addItem(restaurant.getDish("Пицца", "Маргарита"));
 order.addItem(restaurant.getDish("Пицца", "Маргарита"));
 order.addItem(restaurant.getDish("Суши", "Чизмаки"));
 order.show();
-
