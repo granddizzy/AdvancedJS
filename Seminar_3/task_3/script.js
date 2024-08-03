@@ -37,5 +37,5 @@ function loadSavedSelection() {
 }
 
 function displaySelection(selection) {
-  resultDiv.textContent = `Выбранный комплект: Стол - ${selection.table}, Стул - ${selection.chair}, Диван - ${selection.sofa}`;
+  resultDivEl.textContent = `Выбранный комплект: Стол - ${selection.table}, Стул - ${selection.chair}, Диван - ${selection.sofa}`;
 }
