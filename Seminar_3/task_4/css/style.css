@@ -1,0 +1,36 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-decoration: none; }
+
+body {
+  background: #FFF;
+  color: #000;
+  scroll-behavior: smooth; }
+
+html, body {
+  overflow-x: hidden; }
+
+img {
+  max-width: 100%;
+  display: block; }
+
+.hidden {
+  display: none !important; }
+
+.container {
+  max-width: 400px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 50px auto 0; }
+
+.hidden {
+  display: none; }
+
+.error {
+  color: red; }
+
+/*# sourceMappingURL=style.css.map */
