@@ -1,7 +1,7 @@
 const musicCollection = {
   albums: [],
 
-  // про yaeld и генераторы знаю из python
+  // используем генератор
   * [Symbol.iterator]() {
     for (const album of this.albums) {
       yield album;
