@@ -31,17 +31,18 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  gap: 10px; }
+  gap: 10px;
+  justify-content: flex-start; }
   .reviews__inputLabel {
-    width: 80%; }
+    width: 100%;
+    padding: 0 20px; }
   .reviews__input {
     width: 100%;
     height: 100px; }
-  .reviews__reviewsContainer {
-    margin-top: 20px;
-    width: 100%; }
+  .reviews__reviews-container {
+    width: 100%;
+    padding: 20px; }
   .reviews__item {
     border: 1px solid #ccc;
     padding: 10px;
@@ -57,5 +58,13 @@ body {
 @media (max-width: 900px) {
   .container {
     width: auto; } }
+@media (max-width: 300px) {
+  .reviews__inputLabel {
+    padding: 5px; }
+  .reviews__input {
+    width: 100%;
+    height: 100px; }
+  .reviews__reviews-container {
+    padding: 5px; } }
 
 /*# sourceMappingURL=style.css.map */

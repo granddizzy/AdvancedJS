@@ -51,6 +51,7 @@ try {
   console.log(library.allBooks);
   console.log(library.hasBook('Book1'));
   console.log(library.hasBook('Book2'));
+  library.removeBook('Book5');
 } catch (error) {
   console.error(error.message);
 }

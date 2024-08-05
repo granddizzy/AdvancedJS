@@ -7,17 +7,22 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <script src="./script.js" defer></script>
   <link rel="stylesheet" href="./css/style.css">
-  <title>Document</title>
+  <title>Отзывы</title>
 </head>
 <body>
 <div class="container reviews">
-  <h1>Reviews</h1>
+  <h1>Отзывы</h1>
   <label class="reviews__inputLabel">
-    <textarea class="reviews__input" placeholder="Write your review here..."></textarea>
+    <textarea class="reviews__input" placeholder="Напишите свой отзыв здесь..."></textarea>
   </label>
   <div class="reviews__errors"></div>
-  <button class="reviews__button">Submit</button>
-  <div class="reviews__reviewsContainer"></div>
+  <button class="reviews__button">Отправить</button>
+  <div class="reviews__reviews-container"></div>
+  <div class="reviews__pager">
+    <button id="reviews-prevPage-button" disabled>Назад</button>
+    <span id="reviews-pageInfo">Страница 1</span>
+    <button id="reviews-nextPage-button">Вперед</button>
+  </div>
 </div>
 </body>
 </html>
