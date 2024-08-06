@@ -158,12 +158,21 @@ function deleteReview(productId, reviewId) {
     const reviewIndex = reviews[productId].findIndex(review => review.id === numReviewId);
     if (reviewIndex !== -1) {
       reviews[productId].splice(reviewIndex, 1);
-      // если нет отзывов, то удаляем ключ продукта из объекта
+      // если нет отзывов, то удаляем ключ продукта из объекта отзывов и сам продукт из объекта продуктов
       if (reviews[productId].length === 0) {
         delete reviews[productId];
+        deleteProduct(productId);
       }
       localStorage.setItem('reviews', JSON.stringify(reviews));
     }
+  }
+}
+
+function deleteProduct(productId) {
+  const products = getProducts();
+  if (products[productId]) {
+    delete products[productId];
+    localStorage.setItem('products', JSON.stringify(products));
   }
 }
 
@@ -296,11 +305,16 @@ function renderReviewsList(productId) {
   reviewPaginationPrevButtonEl.disabled = currentReviewPage === 1;
   reviewPaginationNextButtonEl.disabled = currentReviewPage === totalPages;
 
-  reviewsListEl.innerHTML = '';
-  paginatedReviews.forEach(el => {
-    const reviewItemNode = createReviewNode(el);
-    reviewsListEl.appendChild(reviewItemNode);
-  });
+  reviewsListEl.classList.add('invisible');
+  setTimeout(() => {
+    reviewsListEl.innerHTML = '';
+    paginatedReviews.forEach(el => {
+      const reviewItemNode = createReviewNode(el);
+      reviewsListEl.appendChild(reviewItemNode);
+    });
+
+    reviewsListEl.classList.remove('invisible');
+  }, 500);
 }
 
 function renderProductList() {
@@ -317,11 +331,16 @@ function renderProductList() {
   productPaginationPrevButtonEl.disabled = currentProductPage === 1;
   productPaginationNextButtonEl.disabled = currentProductPage === totalPages;
 
-  productListEl.innerHTML = '';
-  paginatedProducts.forEach(product => {
-    const productItemEl = createProductNode(product);
-    productListEl.appendChild(productItemEl);
-  });
+  productListEl.classList.add('invisible');
+  setTimeout(() => {
+    productListEl.innerHTML = '';
+    paginatedProducts.forEach(product => {
+      const productItemEl = createProductNode(product);
+      productListEl.appendChild(productItemEl);
+    });
+
+    productListEl.classList.remove('invisible');
+  }, 500);
 }
 
 function handleClearAll(e) {

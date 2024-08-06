@@ -31,15 +31,15 @@ body {
   &__list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-  
-  .products__list {
-    display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 20px;
+    width: 100%;
+    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
+    
+    &.invisible {
+      opacity: 0;
+    }
     
     .product {
       display: flex;
@@ -65,8 +65,6 @@ body {
       }
     }
   }
-  
-  
 }
 
 .reviews {
@@ -168,6 +166,12 @@ body {
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: opacity 0.5s ease-in-out;
+      opacity: 1;
+      
+      &.invisible {
+        opacity: 0;
+      }
       
       .review {
         background: #f9f9f9;
