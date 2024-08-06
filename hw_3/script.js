@@ -2,6 +2,7 @@
 
 const reviewsEl = document.getElementById('reviews');
 const reviewsContentEl = document.getElementById('reviews-content');
+const reviewsContainerEl = reviewsEl.querySelector('.reviews__container');
 const reviewAddFormOpenButtonEl = document.getElementById('open-addReviewForm-button');
 const productListEl = document.getElementById('product-list');
 const reviewsListEl = document.getElementById('reviews-list');
@@ -31,7 +32,6 @@ const maxCharCount = 500;
 reviewAddFormTextEl.addEventListener('input', (e) => {
   updateCharCount(e.target.value.length);
 });
-
 
 reviewsListEl.addEventListener('click', handleDeleteReview);
 clearAllButtonEl.addEventListener('click', handleClearAll);
@@ -84,7 +84,25 @@ reviewPaginationNextButtonEl.addEventListener('click', (e) => {
   }
 });
 
+let touchstartY = 0;
+let touchendY = 0;
+const swipeUpThreshold = 100;
+reviewsContainerEl.addEventListener('touchstart', function (event) {
+  touchstartY = event.changedTouches[0].screenY;
+}, false);
+
+reviewsContainerEl.addEventListener('touchend', function (event) {
+  touchendY = event.changedTouches[0].screenY;
+  handleSwipe();
+}, false);
+
 renderProductList(false);
+
+function handleSwipe() {
+  if (touchstartY - touchendY > swipeUpThreshold) {
+    closeModalWindow();
+  }
+}
 
 function getProducts() {
   const jsonData = localStorage.getItem('products')
@@ -206,7 +224,7 @@ function handleAddReview(e) {
     text: reviewAddFormTextEl.value
   });
   closeModalWindow();
-  renderProductList();
+  renderProductList(false);
 }
 
 function createProductNode(product) {
