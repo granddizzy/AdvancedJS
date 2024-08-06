@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./script.js" type="module" defer></script>
+  <title>Товары</title>
+</head>
+<body>
+<div class="container products">
+  <h1>Список продуктов</h1>
+  <div>
+    <button id="open-addReviewForm-button" class="button">Добавить отзыв</button>
+    <button id="clear-all-button" class="button">Очистить</button>
+  </div>
+  <div id="product-list" class="products__list"></div>
+  <template id="product-template">
+    <div class="products__item product">
+      <div class="product__line"><b>Название:</b> <span class="product__name"></span></div>
+      <div class="product__line"><b>Кол-во отзывов:</b> <span class="product__review-count"></span></div>
+    </div>
+  </template>
+</div>
+<div id="reviews" class="reviews hidden">
+  <div class="reviews__content">
+    <div class="reviews__close-button">X</div>
+    <h1 id="reviews-title">Отзывы</h1>
+    <div id="reviews-list" class="reviews__list reviews-list"></div>
+    <template id="review-template">
+      <div class="reviews-list__item review">
+        <div class="review__line"><b>Дата:</b> <span class="review__date"></span></div>
+        <div class="review__line"><b>Отзыв:</b> <span class="review__text"></span></div>
+        <button class="review__delete-button button">Удалить</button>
+      </div>
+    </template>
+    <form id="add-review-form" class="reviews__add-form add-review-form hidden">
+      <input id="review-productId" type="hidden" value="">
+      <label>
+        <b>Продукт:</b>
+        <input type="text" name="product" class="add-review-form__product">
+      </label>
+      <label>
+        <b>Отзыв:</b>
+        <textarea name="text" class="add-review-form__text" placeholder=""></textarea>
+      </label>
+      <div>
+        <button id="add-review-button" class="button">Добавить</button>
+        <button id="cancel-review-button" class="button">Отмена</button>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>
