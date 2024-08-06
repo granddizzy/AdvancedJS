@@ -21,6 +21,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  margin-top: 20px;
   
   h1 {
     text-align: center;
@@ -34,29 +35,38 @@ body {
     width: 100%;
   }
   
-  &__item {
+  .products__list {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 10px;
-    background: #e9ecef;
-    border-radius: 4px;
-    transition: background 0.3s;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-  
-  .product {
-    cursor: pointer;
-    &__line {
-      display: block;
-      width: 100%;
+    gap: 20px;
+    
+    .product {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-direction: column;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s;
+      cursor: pointer;
+      background: #f9f9f9;
+      width: 90%;
+      
+      &__line {
+        display: block;
+        width: 100%;
+      }
+      
+      &:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
     }
   }
   
-  &__item:hover {
-    background: #dee2e6;
-  }
+  
 }
 
 .reviews {
@@ -80,7 +90,7 @@ body {
     cursor: pointer;
   }
   
-  &__content {
+  &__container {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -91,67 +101,50 @@ body {
     margin: 1% auto;
     padding: 10px;
     border: 1px solid #888;
-    max-width: 95%;
-    text-align: center;
+    max-width: 900px;
     transform: translateY(-50px);
     transition: transform 0.3s ease-in-out;
     border-radius: 10px;
+  }
+  
+  .add-review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    width: 95%;
+    margin-bottom: 20px;
     
-    .add-review-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background-color: #f9f9f9;
-      width: 95%;
-    }
-    
-    .add-review-form.hidden {
+    &.hidden {
       display: none;
     }
     
-    .add-review-form label {
+    label {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
     }
     
-    .add-review-form input[type="text"],
-    .add-review-form textarea {
+    input[type="text"],
+    textarea {
       width: 100%;
       padding: 0.5rem;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
     
-    .add-review-form textarea {
+    textarea {
       resize: vertical;
+      height: 10em;
     }
     
-    .add-review-form div {
+    &__buttons {
       display: flex;
-      gap: 1rem;
-    }
-    
-    .add-review-form .button {
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 4px;
-      background-color: #007BFF;
-      color: #fff;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    
-    .add-review-form .button:hover {
-      background-color: #0056b3;
-    }
-    
-    .add-review-form .button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
+      gap: 30px;
+      justify-content: center;
     }
   }
   
@@ -159,8 +152,69 @@ body {
     opacity: 1;
   }
   
-  &.show &__content{
+  &.show &__container {
     transform: translateY(0);
+  }
+  
+  .reviews__content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    
+    .reviews-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .review {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s;
+        width: 90%;
+        
+        &__header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+        
+        &__date-container {
+          font-size: 0.9rem;
+          color: #555;
+        }
+        
+        &__line {
+          font-size: 1rem;
+          color: #333;
+        }
+        
+        &__delete-button {
+          background-color: #e74c3c;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 5px 10px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+        }
+        
+        &__delete-button:hover {
+          background-color: #c0392b;
+        }
+        
+        &:hover {
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+      }
+    }
   }
 }
 
@@ -172,10 +226,10 @@ button {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #0056b3;
+  
+  &:hover {
+    background-color: #0056b3;
+  }
 }
 
 .hidden {

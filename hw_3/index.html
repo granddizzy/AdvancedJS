@@ -14,7 +14,7 @@
   <h1>Список продуктов</h1>
   <div>
     <button id="open-addReviewForm-button" class="button">Добавить отзыв</button>
-    <button id="clear-all-button" class="button">Очистить</button>
+    <button id="clear-all-button" class="button hidden">Очистить</button>
   </div>
   <div id="product-list" class="products__list"></div>
   <template id="product-template">
@@ -25,17 +25,26 @@
   </template>
 </div>
 <div id="reviews" class="reviews hidden">
-  <div class="reviews__content">
+  <div class="reviews__container">
     <div class="reviews__close-button">X</div>
     <h1 id="reviews-title">Отзывы</h1>
-    <div id="reviews-list" class="reviews__list reviews-list"></div>
-    <template id="review-template">
-      <div class="reviews-list__item review">
-        <div class="review__line"><b>Дата:</b> <span class="review__date"></span></div>
-        <div class="review__line"><b>Отзыв:</b> <span class="review__text"></span></div>
-        <button class="review__delete-button button">Удалить</button>
-      </div>
-    </template>
+    <div id="reviews-content" class="reviews__content">
+      <button id="open-addReviewForm-button-byProduct" class="button">Добавить отзыв</button>
+      <div id="reviews-list" class="reviews__list reviews-list"></div>
+      <template id="review-template">
+        <div class="reviews-list__item review">
+          <div class="review__header">
+            <div class="review__date-container">
+              <b>Дата:</b> <span class="review__date"></span>
+            </div>
+            <button class="review__delete-button button">Удалить</button>
+          </div>
+          <div class="review__line">
+            <b>Отзыв:</b> <span class="review__text"></span>
+          </div>
+        </div>
+      </template>
+    </div>
     <form id="add-review-form" class="reviews__add-form add-review-form hidden">
       <input id="review-productId" type="hidden" value="">
       <label>
@@ -46,7 +55,7 @@
         <b>Отзыв:</b>
         <textarea name="text" class="add-review-form__text" placeholder=""></textarea>
       </label>
-      <div>
+      <div class="add-review-form__buttons">
         <button id="add-review-button" class="button">Добавить</button>
         <button id="cancel-review-button" class="button">Отмена</button>
       </div>

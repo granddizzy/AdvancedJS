@@ -1,17 +1,17 @@
 "use strict"
 
 const reviewsEl = document.getElementById('reviews');
-// const reviewProductEl = reviewsEl.querySelector('.reviews__product');
+const reviewsContentEl = document.getElementById('reviews-content');
 const reviewAddFormOpenButtonEl = document.getElementById('open-addReviewForm-button');
 const productListEl = document.getElementById('product-list');
 const reviewsListEl = document.getElementById('reviews-list');
 const reviewsTitleEl = document.getElementById('reviews-title');
 const reviewsCloseButtonEl = reviewsEl.querySelector('.reviews__close-button');
+const reviewsAddFormOpenByProductButtonEl = document.getElementById('open-addReviewForm-button-byProduct');
 
 const reviewAddFormEl = reviewsEl.querySelector('.add-review-form');
 const reviewAddFormProductEl = reviewAddFormEl.querySelector('.add-review-form__product');
 const reviewAddFormTextEl = reviewAddFormEl.querySelector('.add-review-form__text');
-
 const reviewAddFormSubmitButtonEl = document.getElementById('add-review-button');
 const reviewAddFormCancelButtonEl = document.getElementById('cancel-review-button');
 
@@ -19,6 +19,7 @@ const clearAllButtonEl = document.getElementById('clear-all-button');
 
 productListEl.addEventListener('click', handleOpenReviews);
 reviewsCloseButtonEl.addEventListener('click', handleCloseReviews);
+reviewsAddFormOpenByProductButtonEl.addEventListener('click', handleOpenReviewAddFormByProduct);
 
 reviewAddFormOpenButtonEl.addEventListener('click', handleOpenReviewAddForm);
 reviewAddFormSubmitButtonEl.addEventListener('click', handleAddReview);
@@ -153,12 +154,25 @@ function createReviewNode(data) {
 }
 
 function handleOpenReviewAddForm(e) {
-  reviewsListEl.classList.add('hidden');
+  reviewsContentEl.classList.add('hidden');
   reviewAddFormEl.classList.remove('hidden');
   reviewsTitleEl.textContent = 'Добавление отзыва'
   reviewAddFormTextEl.value = '';
   reviewAddFormProductEl.value = '';
   openModalWindow();
+}
+
+function handleOpenReviewAddFormByProduct(e) {
+  const reviewsEl = e.target.closest('.reviews');
+  if (reviewsEl) {
+    reviewsContentEl.classList.add('hidden');
+    reviewAddFormEl.classList.remove('hidden');
+    reviewsTitleEl.textContent = 'Добавление отзыва'
+    const product = getProduct(reviewsEl.getAttribute('data-productId'))
+    reviewAddFormTextEl.value = '';
+    reviewAddFormProductEl.value = product.name;
+    openModalWindow();
+  }
 }
 
 function handleCloseAddReviewForm(e) {
@@ -199,7 +213,7 @@ function handleOpenReviews(e) {
     // reviewProductEl.textContent = productEl.querySelector('.product__name').textContent;
 
     reviewsListEl.innerHTML = '';
-    reviewsListEl.classList.remove('hidden');
+    reviewsContentEl.classList.remove('hidden');
     reviewAddFormEl.classList.add('hidden');
     reviewsTitleEl.textContent = `Отзывы на ${productEl.querySelector('.product__name').textContent}`;
     openModalWindow();
@@ -208,14 +222,16 @@ function handleOpenReviews(e) {
 }
 
 function handleDeleteReview(e) {
-  const reviewsEl = e.target.closest('.reviews');
-  const reviewEl = e.target.closest('.review');
-  if (reviewsEl && reviewEl) {
-    const productId = reviewsEl.getAttribute('data-productId');
-    const reviewId = reviewEl.getAttribute('data-id');
-    deleteReview(productId, reviewId);
-    renderReviewsList(productId);
-    renderProductList();
+  if (e.target.classList.contains('review__delete-button')) {
+    const reviewsEl = e.target.closest('.reviews');
+    const reviewEl = e.target.closest('.review');
+    if (reviewsEl && reviewEl) {
+      const productId = reviewsEl.getAttribute('data-productId');
+      const reviewId = reviewEl.getAttribute('data-id');
+      deleteReview(productId, reviewId);
+      renderReviewsList(productId);
+      renderProductList();
+    }
   }
 }
 
@@ -240,4 +256,14 @@ function renderProductList() {
 function handleClearAll(e) {
   localStorage.clear();
   renderProductList();
+}
+
+function getProduct(productId) {
+  const products = getProducts();
+  return products[productId];
+}
+
+function getReview(reviewId) {
+  const reviews = getReviews();
+  return reviews[reviewId];
 }
