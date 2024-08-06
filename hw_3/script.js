@@ -14,6 +14,7 @@ const reviewAddFormProductEl = reviewAddFormEl.querySelector('.add-review-form__
 const reviewAddFormTextEl = reviewAddFormEl.querySelector('.add-review-form__text');
 const reviewAddFormSubmitButtonEl = document.getElementById('add-review-button');
 const reviewAddFormCancelButtonEl = document.getElementById('cancel-review-button');
+const reviewAddFormErrorsEl = reviewAddFormEl.querySelector('.add-review-form__errors');
 
 const clearAllButtonEl = document.getElementById('clear-all-button');
 
@@ -24,6 +25,13 @@ reviewsAddFormOpenByProductButtonEl.addEventListener('click', handleOpenReviewAd
 reviewAddFormOpenButtonEl.addEventListener('click', handleOpenReviewAddForm);
 reviewAddFormSubmitButtonEl.addEventListener('click', handleAddReview);
 reviewAddFormCancelButtonEl.addEventListener('click', handleCloseAddReviewForm);
+
+const minCharCount = 50;
+const maxCharCount = 500;
+reviewAddFormTextEl.addEventListener('input', (e) => {
+  updateCharCount(e.target.value.length);
+});
+
 
 reviewsListEl.addEventListener('click', handleDeleteReview);
 clearAllButtonEl.addEventListener('click', handleClearAll);
@@ -76,7 +84,7 @@ reviewPaginationNextButtonEl.addEventListener('click', (e) => {
   }
 });
 
-renderProductList();
+renderProductList(false);
 
 function getProducts() {
   const jsonData = localStorage.getItem('products')
@@ -178,6 +186,16 @@ function deleteProduct(productId) {
 
 function handleAddReview(e) {
   e.preventDefault();
+
+  const productName = reviewAddFormProductEl.value;
+  const reviewText = reviewAddFormTextEl.value;
+  try {
+    validateReview(productName, reviewText);
+  } catch (error) {
+    showError(error.message);
+    return;
+  }
+
   let product = getProductByName(reviewAddFormProductEl.value);
   if (!product) {
     product = saveProduct(getLastProductId() + 1, reviewAddFormProductEl.value)
@@ -205,7 +223,8 @@ function createReviewNode(data) {
   const reviewTemplateEl = document.getElementById('review-template');
   const reviewNode = reviewTemplateEl.content.cloneNode(true);
   reviewNode.querySelector('.review').setAttribute('data-id', data.id);
-  reviewNode.querySelector('.review__date').textContent = data.date;
+  const date = new Date(data.date);
+  reviewNode.querySelector('.review__date').textContent = `${date.toLocaleDateString('ru-RU')} ${date.toLocaleTimeString('ru-RU')}`;
   reviewNode.querySelector('.review__text').textContent = data.text;
   return reviewNode;
 }
@@ -216,6 +235,7 @@ function handleOpenReviewAddForm(e) {
   reviewsTitleEl.textContent = 'Добавление отзыва'
   reviewAddFormTextEl.value = '';
   reviewAddFormProductEl.value = '';
+  reviewAddFormErrorsEl.value = '';
   openModalWindow();
 }
 
@@ -273,7 +293,7 @@ function handleOpenReviews(e) {
     reviewAddFormEl.classList.add('hidden');
     reviewsTitleEl.textContent = `Отзывы на ${productEl.querySelector('.product__name').textContent}`;
     openModalWindow();
-    renderReviewsList(productId);
+    renderReviewsList(productId, false);
   }
 }
 
@@ -291,56 +311,77 @@ function handleDeleteReview(e) {
   }
 }
 
-function renderReviewsList(productId) {
+function renderReviewsList(productId, fullCycle = true) {
   const reviews = getReviewsByProduct(productId);
   const reviewsArray = Object.values(reviews);
   const totalReviews = reviewsArray.length;
+
+  const totalPages = Math.max(1, Math.ceil(totalReviews / reviewPerPage));
+  currentReviewPage = Math.min(currentReviewPage, totalPages);
 
   const start = (currentReviewPage - 1) * reviewPerPage;
   const end = start + reviewPerPage;
   const paginatedReviews = reviewsArray.slice(start, end);
 
-  const totalPages = Math.max(1, Math.ceil(totalReviews / reviewPerPage));
   reviewPaginationPageInfoEl.textContent = `Страница ${currentReviewPage} из ${totalPages}`;
   reviewPaginationPrevButtonEl.disabled = currentReviewPage === 1;
   reviewPaginationNextButtonEl.disabled = currentReviewPage === totalPages;
 
-  reviewsListEl.classList.add('invisible');
-  setTimeout(() => {
-    reviewsListEl.innerHTML = '';
-    paginatedReviews.forEach(el => {
-      const reviewItemNode = createReviewNode(el);
-      reviewsListEl.appendChild(reviewItemNode);
-    });
+  if (fullCycle) {
+    reviewsListEl.classList.add('invisible');
+    setTimeout(() => {
+      showReviewList(paginatedReviews);
+    }, 500);
+  } else {
+    showReviewList(paginatedReviews);
+  }
 
-    reviewsListEl.classList.remove('invisible');
-  }, 500);
+  if (totalReviews === 0) closeModalWindow();
 }
 
-function renderProductList() {
+function showReviewList(paginatedReviews) {
+  reviewsListEl.innerHTML = '';
+  paginatedReviews.forEach(el => {
+    const reviewItemNode = createReviewNode(el);
+    reviewsListEl.appendChild(reviewItemNode);
+  });
+  reviewsListEl.classList.remove('invisible');
+}
+
+function renderProductList(fullCycle = true) {
   const products = getProducts();
   const productArray = Object.values(products);
   const totalProducts = productArray.length;
+
+  const totalPages = Math.max(1, Math.ceil(totalProducts / productsPerPage));
+  currentProductPage = Math.min(currentProductPage, totalPages);
 
   const start = (currentProductPage - 1) * productsPerPage;
   const end = start + productsPerPage;
   const paginatedProducts = productArray.slice(start, end);
 
-  const totalPages = Math.max(1, Math.ceil(totalProducts / productsPerPage));
   productPaginationPageInfoEl.textContent = `Страница ${currentProductPage} из ${totalPages}`;
   productPaginationPrevButtonEl.disabled = currentProductPage === 1;
   productPaginationNextButtonEl.disabled = currentProductPage === totalPages;
 
-  productListEl.classList.add('invisible');
-  setTimeout(() => {
-    productListEl.innerHTML = '';
-    paginatedProducts.forEach(product => {
-      const productItemEl = createProductNode(product);
-      productListEl.appendChild(productItemEl);
-    });
+  if (fullCycle) {
+    productListEl.classList.add('invisible');
+    setTimeout(() => {
+      showProductList(paginatedProducts);
+    }, 500);
+  } else {
+    showProductList(paginatedProducts);
+  }
+}
 
-    productListEl.classList.remove('invisible');
-  }, 500);
+function showProductList(paginatedProducts) {
+  productListEl.innerHTML = '';
+  paginatedProducts.forEach(product => {
+    const productItemEl = createProductNode(product);
+    productListEl.appendChild(productItemEl);
+  });
+
+  productListEl.classList.remove('invisible');
 }
 
 function handleClearAll(e) {
@@ -356,4 +397,25 @@ function getProduct(productId) {
 function getReview(reviewId) {
   const reviews = getReviews();
   return reviews[reviewId];
+}
+
+function updateCharCount(count) {
+  if (count < minCharCount || count > maxCharCount) {
+    reviewAddFormErrorsEl.textContent = count;
+  } else {
+    reviewAddFormErrorsEl.textContent = '';
+  }
+}
+
+function validateReview(productName, reviewText) {
+  if (productName.length < 1 || reviewText.length > 100) {
+    throw new Error('Название продукта должно быть от 1 до 100 символов.');
+  }
+  if (reviewText.length < minCharCount || reviewText.length > maxCharCount) {
+    throw new Error(`Отзыв должен быть от ${minCharCount} до ${maxCharCount} символов.`);
+  }
+}
+
+function showError(text) {
+  reviewAddFormErrorsEl.textContent = text;
 }

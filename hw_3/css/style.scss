@@ -36,6 +36,7 @@ body {
     width: 100%;
     transition: opacity 0.5s ease-in-out;
     opacity: 1;
+    min-height: 100px;
     
     &.invisible {
       opacity: 0;
@@ -54,6 +55,7 @@ body {
       cursor: pointer;
       background: #f9f9f9;
       width: 90%;
+      gap: 10px;
       
       &__line {
         display: block;
@@ -116,6 +118,17 @@ body {
     width: 95%;
     margin-bottom: 20px;
     
+    &__errors {
+      display: block;
+      color: #FF0000;
+      min-height: 1em;
+      line-height: 1;
+    }
+    
+    &__errors {
+      text-align: center;
+    }
+    
     &.hidden {
       display: none;
     }
@@ -168,6 +181,7 @@ body {
       align-items: center;
       transition: opacity 0.5s ease-in-out;
       opacity: 1;
+      min-height: 100px;
       
       &.invisible {
         opacity: 0;
