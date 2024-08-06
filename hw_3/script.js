@@ -31,11 +31,11 @@ clearAllButtonEl.addEventListener('click', handleClearAll);
 const productsPerPage = 5;
 let currentProductPage = 1;
 const productsPaginationEl = document.querySelector('.product-list-pagination');
-const productsPaginationPrevButtonEl = productsPaginationEl.querySelector('.product-list-pagination__prevButton');
+const productPaginationPrevButtonEl = productsPaginationEl.querySelector('.product-list-pagination__prevButton');
 const productPaginationNextButtonEl = productsPaginationEl.querySelector('.product-list-pagination__nextButton');
 const productPaginationPageInfoEl = productsPaginationEl.querySelector('.product-list-pagination__page-info');
 
-productsPaginationPrevButtonEl.addEventListener('click', (e) => {
+productPaginationPrevButtonEl.addEventListener('click', (e) => {
   if (currentProductPage > 1) {
     currentProductPage--;
     renderProductList();
@@ -258,7 +258,6 @@ function handleOpenReviews(e) {
   if (productEl) {
     const productId = productEl.getAttribute('data-id');
     reviewsEl.setAttribute('data-productId', productId);
-    // reviewProductEl.textContent = productEl.querySelector('.product__name').textContent;
 
     reviewsListEl.innerHTML = '';
     reviewsContentEl.classList.remove('hidden');
@@ -288,12 +287,14 @@ function renderReviewsList(productId) {
   const reviewsArray = Object.values(reviews);
   const totalReviews = reviewsArray.length;
 
-  const totalPages = Math.ceil(totalReviews / reviewPerPage);
-  currentReviewPage = Math.max(1, Math.min(currentReviewPage, totalPages));
   const start = (currentReviewPage - 1) * reviewPerPage;
   const end = start + reviewPerPage;
   const paginatedReviews = reviewsArray.slice(start, end);
+
+  const totalPages = Math.max(1, Math.ceil(totalReviews / reviewPerPage));
   reviewPaginationPageInfoEl.textContent = `Страница ${currentReviewPage} из ${totalPages}`;
+  reviewPaginationPrevButtonEl.disabled = currentReviewPage === 1;
+  reviewPaginationNextButtonEl.disabled = currentReviewPage === totalPages;
 
   reviewsListEl.innerHTML = '';
   paginatedReviews.forEach(el => {
@@ -307,12 +308,14 @@ function renderProductList() {
   const productArray = Object.values(products);
   const totalProducts = productArray.length;
 
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
-  currentProductPage = Math.max(1, Math.min(currentProductPage, totalPages));
   const start = (currentProductPage - 1) * productsPerPage;
   const end = start + productsPerPage;
   const paginatedProducts = productArray.slice(start, end);
+
+  const totalPages = Math.max(1, Math.ceil(totalProducts / productsPerPage));
   productPaginationPageInfoEl.textContent = `Страница ${currentProductPage} из ${totalPages}`;
+  productPaginationPrevButtonEl.disabled = currentProductPage === 1;
+  productPaginationNextButtonEl.disabled = currentProductPage === totalPages;
 
   productListEl.innerHTML = '';
   paginatedProducts.forEach(product => {
