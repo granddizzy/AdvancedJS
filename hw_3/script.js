@@ -28,6 +28,29 @@ reviewAddFormCancelButtonEl.addEventListener('click', handleCloseAddReviewForm);
 reviewsListEl.addEventListener('click', handleDeleteReview)
 clearAllButtonEl.addEventListener('click', handleClearAll)
 
+const productsPerPage = 5;
+let currentProductPage = 1;
+const productsPaginationEl = document.querySelector('.product-list__pagination');
+const productsPaginationPrevButtonEl = productsPaginationEl.querySelector('.product-list__prevButton');
+const productPaginationNextButtonEl = productsPaginationEl.querySelector('.product-list__nextButton');
+const productPaginationPageInfoEl = productsPaginationEl.querySelector('.product-list__page-info');
+
+productsPaginationPrevButtonEl.addEventListener('click', () => {
+  if (currentProductPage > 1) {
+    currentProductPage--;
+    renderProductList();
+  }
+});
+
+productPaginationNextButtonEl.addEventListener('click', () => {
+  const totalProducts = Object.keys(getProducts()).length;
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  if (currentProductPage < totalPages) {
+    currentProductPage++;
+    renderProductList();
+  }
+});
+
 renderProductList();
 
 function getProducts() {
@@ -246,11 +269,21 @@ function renderReviewsList(productId) {
 
 function renderProductList() {
   const products = getProducts();
+  const productArray = Object.values(products);
+  const totalProducts = productArray.length;
+
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  currentProductPage = Math.max(1, Math.min(currentProductPage, totalPages));
+  const start = (currentProductPage - 1) * productsPerPage;
+  const end = start + productsPerPage;
+  const paginatedProducts = productArray.slice(start, end);
+  productPaginationPageInfoEl.textContent = `Страница ${currentProductPage} из ${totalPages}`;
+
   productListEl.innerHTML = '';
-  for (const product of Object.values(products)) {
+  paginatedProducts.forEach(product => {
     const productItemEl = createProductNode(product);
     productListEl.appendChild(productItemEl);
-  }
+  });
 }
 
 function handleClearAll(e) {
