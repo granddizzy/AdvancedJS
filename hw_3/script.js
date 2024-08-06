@@ -25,29 +25,54 @@ reviewAddFormOpenButtonEl.addEventListener('click', handleOpenReviewAddForm);
 reviewAddFormSubmitButtonEl.addEventListener('click', handleAddReview);
 reviewAddFormCancelButtonEl.addEventListener('click', handleCloseAddReviewForm);
 
-reviewsListEl.addEventListener('click', handleDeleteReview)
-clearAllButtonEl.addEventListener('click', handleClearAll)
+reviewsListEl.addEventListener('click', handleDeleteReview);
+clearAllButtonEl.addEventListener('click', handleClearAll);
 
 const productsPerPage = 5;
 let currentProductPage = 1;
-const productsPaginationEl = document.querySelector('.product-list__pagination');
-const productsPaginationPrevButtonEl = productsPaginationEl.querySelector('.product-list__prevButton');
-const productPaginationNextButtonEl = productsPaginationEl.querySelector('.product-list__nextButton');
-const productPaginationPageInfoEl = productsPaginationEl.querySelector('.product-list__page-info');
+const productsPaginationEl = document.querySelector('.product-list-pagination');
+const productsPaginationPrevButtonEl = productsPaginationEl.querySelector('.product-list-pagination__prevButton');
+const productPaginationNextButtonEl = productsPaginationEl.querySelector('.product-list-pagination__nextButton');
+const productPaginationPageInfoEl = productsPaginationEl.querySelector('.product-list-pagination__page-info');
 
-productsPaginationPrevButtonEl.addEventListener('click', () => {
+productsPaginationPrevButtonEl.addEventListener('click', (e) => {
   if (currentProductPage > 1) {
     currentProductPage--;
     renderProductList();
   }
 });
 
-productPaginationNextButtonEl.addEventListener('click', () => {
+productPaginationNextButtonEl.addEventListener('click', (e) => {
   const totalProducts = Object.keys(getProducts()).length;
   const totalPages = Math.ceil(totalProducts / productsPerPage);
   if (currentProductPage < totalPages) {
     currentProductPage++;
     renderProductList();
+  }
+});
+
+const reviewPerPage = 5;
+let currentReviewPage = 1;
+const reviewPaginationEl = document.querySelector('.review-list-pagination');
+const reviewPaginationPrevButtonEl = reviewPaginationEl.querySelector('.review-list-pagination__prevButton');
+const reviewPaginationNextButtonEl = reviewPaginationEl.querySelector('.review-list-pagination__nextButton');
+const reviewPaginationPageInfoEl = reviewPaginationEl.querySelector('.review-list-pagination__page-info');
+
+reviewPaginationPrevButtonEl.addEventListener('click', (e) => {
+  if (currentReviewPage > 1) {
+    currentReviewPage--;
+    const productId = reviewsEl.getAttribute('data-productId');
+    renderReviewsList(productId);
+  }
+});
+
+reviewPaginationNextButtonEl.addEventListener('click', (e) => {
+  const productId = reviewsEl.getAttribute('data-productId');
+  const totalReviews = Object.keys(getReviewsByProduct(productId)).length;
+  const totalPages = Math.ceil(totalReviews / reviewPerPage);
+  if (currentReviewPage < totalPages) {
+    currentReviewPage++;
+    renderReviewsList(productId);
   }
 });
 
@@ -260,8 +285,18 @@ function handleDeleteReview(e) {
 
 function renderReviewsList(productId) {
   const reviews = getReviewsByProduct(productId);
+  const reviewsArray = Object.values(reviews);
+  const totalReviews = reviewsArray.length;
+
+  const totalPages = Math.ceil(totalReviews / reviewPerPage);
+  currentReviewPage = Math.max(1, Math.min(currentReviewPage, totalPages));
+  const start = (currentReviewPage - 1) * reviewPerPage;
+  const end = start + reviewPerPage;
+  const paginatedReviews = reviewsArray.slice(start, end);
+  reviewPaginationPageInfoEl.textContent = `Страница ${currentReviewPage} из ${totalPages}`;
+
   reviewsListEl.innerHTML = '';
-  reviews.forEach(el => {
+  paginatedReviews.forEach(el => {
     const reviewItemNode = createReviewNode(el);
     reviewsListEl.appendChild(reviewItemNode);
   });

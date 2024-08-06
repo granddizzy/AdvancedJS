@@ -17,10 +17,10 @@
     <button id="clear-all-button" class="button hidden">Очистить</button>
   </div>
   <div id="product-list" class="products__list"></div>
-  <div class="product-list__pagination">
-    <button class="product-list__prevButton button">Предыдущая</button>
-    <span class="product-list__page-info"></span>
-    <button class="product-list__nextButton button">Следующая</button>
+  <div class="products__list-pagination product-list-pagination">
+    <button class=product-list-pagination__prevButton button">Предыдущая</button>
+    <span class="product-list-pagination__page-info"></span>
+    <button class="product-list-pagination__nextButton button">Следующая</button>
   </div>
   <template id="product-template">
     <div class="products__item product">
@@ -36,6 +36,11 @@
     <div id="reviews-content" class="reviews__content">
       <button id="open-addReviewForm-button-byProduct" class="button">Добавить отзыв</button>
       <div id="reviews-list" class="reviews__list reviews-list"></div>
+      <div class="reviews__list-pagination review-list-pagination">
+        <button class="review-list-pagination__prevButton button">Предыдущая</button>
+        <span class="review-list-pagination__page-info"></span>
+        <button class="review-list-pagination__nextButton button">Следующая</button>
+      </div>
       <template id="review-template">
         <div class="reviews-list__item review">
           <div class="review__header">
