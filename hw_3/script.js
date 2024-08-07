@@ -113,27 +113,36 @@ function getProducts() {
   try {
     return JSON.parse(jsonData);
   } catch (e) {
-    // console.error('Failed to parse reviews:', e);
+    console.error('Failed to parse reviews:', e);
     return {};
   }
 }
 
 function saveReview(productId, review) {
-  let productReviews = [];
-  const reviews = getReviews();
-  if (productId in reviews) {
-    productReviews = reviews[productId];
+  try {
+    let productReviews = [];
+    const reviews = getReviews();
+    if (productId in reviews) {
+      productReviews = reviews[productId];
+    }
+    productReviews.push(review)
+    reviews[productId] = productReviews;
+    localStorage.setItem('reviews', JSON.stringify(reviews));
+  } catch (e) {
+    console.error('Failed to save review:', e);
   }
-  productReviews.push(review)
-  reviews[productId] = productReviews;
-  localStorage.setItem('reviews', JSON.stringify(reviews));
 }
 
 function saveProduct(productId, productName) {
-  const products = getProducts();
-  products[productId] = {id: productId, name: productName};
-  localStorage.setItem('products', JSON.stringify(products));
-  return products[productId];
+  try {
+    const products = getProducts();
+    products[productId] = {id: productId, name: productName};
+    localStorage.setItem('products', JSON.stringify(products));
+    return products[productId];
+  } catch (e) {
+    console.error('Failed to save product:', e);
+  }
+
 }
 
 function getLastProductId() {
@@ -164,7 +173,7 @@ function getReviews() {
   try {
     return JSON.parse(jsonData);
   } catch (e) {
-    // console.error('Failed to parse reviews:', e);
+    console.error('Failed to parse reviews:', e);
     return {};
   }
 }
@@ -178,19 +187,23 @@ function getReviewsByProduct(productId) {
 }
 
 function deleteReview(productId, reviewId) {
-  const reviews = getReviews();
-  if (reviews[productId]) {
-    const numReviewId = parseInt(reviewId);
-    const reviewIndex = reviews[productId].findIndex(review => review.id === numReviewId);
-    if (reviewIndex !== -1) {
-      reviews[productId].splice(reviewIndex, 1);
-      // если нет отзывов, то удаляем ключ продукта из объекта отзывов и сам продукт из объекта продуктов
-      if (reviews[productId].length === 0) {
-        delete reviews[productId];
-        deleteProduct(productId);
+  try {
+    const reviews = getReviews();
+    if (reviews[productId]) {
+      const numReviewId = parseInt(reviewId);
+      const reviewIndex = reviews[productId].findIndex(review => review.id === numReviewId);
+      if (reviewIndex !== -1) {
+        reviews[productId].splice(reviewIndex, 1);
+        // если нет отзывов, то удаляем ключ продукта из объекта отзывов и сам продукт из объекта продуктов
+        if (reviews[productId].length === 0) {
+          delete reviews[productId];
+          deleteProduct(productId);
+        }
+        localStorage.setItem('reviews', JSON.stringify(reviews));
       }
-      localStorage.setItem('reviews', JSON.stringify(reviews));
     }
+  } catch (e) {
+    console.error('Failed to delete review:', e);
   }
 }
 
@@ -218,11 +231,13 @@ function handleAddReview(e) {
   if (!product) {
     product = saveProduct(getLastProductId() + 1, reviewAddFormProductEl.value)
   }
-  saveReview(product.id, {
-    id: getLastReviewId(product.id) + 1,
-    date: new Date(),
-    text: reviewAddFormTextEl.value
-  });
+  if (product) {
+    saveReview(product.id, {
+      id: getLastReviewId(product.id) + 1,
+      date: new Date(),
+      text: reviewAddFormTextEl.value
+    });
+  }
   closeModalWindow();
   renderProductList(false);
 }
@@ -276,20 +291,27 @@ function handleCloseAddReviewForm(e) {
 }
 
 function openModalWindow() {
-  // событие закрытия модального окна
-  window.addEventListener('click', handleCloseReviews);
+  try {
+    window.addEventListener('click', handleCloseReviews);
 
-  reviewsEl.classList.remove('hidden');
-  setTimeout(() => {
-    reviewsEl.classList.add("show");
-  }, 10);
+    reviewsEl.classList.remove('hidden');
+    setTimeout(() => {
+      reviewsEl.classList.add("show");
+    }, 10);
+  } catch (e) {
+    console.error('Failed to open modal window:', e);
+  }
 }
 
 function closeModalWindow() {
-  reviewsEl.classList.remove("show");
-  setTimeout(() => {
-    reviewsEl.classList.add('hidden');
-  }, 300);
+  try {
+    reviewsEl.classList.remove("show");
+    setTimeout(() => {
+      reviewsEl.classList.add('hidden');
+    }, 300);
+  } catch (e) {
+    console.error('Failed to close modal window:', e);
+  }
 }
 
 function handleCloseReviews(e) {
@@ -330,76 +352,93 @@ function handleDeleteReview(e) {
 }
 
 function renderReviewsList(productId, fullCycle = true) {
-  const reviews = getReviewsByProduct(productId);
-  const reviewsArray = Object.values(reviews);
-  const totalReviews = reviewsArray.length;
+  let totalReviews = 0;
+  try {
+    const reviews = getReviewsByProduct(productId);
+    const reviewsArray = Object.values(reviews);
+    totalReviews = reviewsArray.length;
 
-  const totalPages = Math.max(1, Math.ceil(totalReviews / reviewPerPage));
-  currentReviewPage = Math.min(currentReviewPage, totalPages);
+    const totalPages = Math.max(1, Math.ceil(totalReviews / reviewPerPage));
+    currentReviewPage = Math.min(currentReviewPage, totalPages);
 
-  const start = (currentReviewPage - 1) * reviewPerPage;
-  const end = start + reviewPerPage;
-  const paginatedReviews = reviewsArray.slice(start, end);
+    const start = (currentReviewPage - 1) * reviewPerPage;
+    const end = start + reviewPerPage;
+    const paginatedReviews = reviewsArray.slice(start, end);
 
-  reviewPaginationPageInfoEl.textContent = `Страница ${currentReviewPage} из ${totalPages}`;
-  reviewPaginationPrevButtonEl.disabled = currentReviewPage === 1;
-  reviewPaginationNextButtonEl.disabled = currentReviewPage === totalPages;
+    reviewPaginationPageInfoEl.textContent = `Страница ${currentReviewPage} из ${totalPages}`;
+    reviewPaginationPrevButtonEl.disabled = currentReviewPage === 1;
+    reviewPaginationNextButtonEl.disabled = currentReviewPage === totalPages;
 
-  if (fullCycle) {
-    reviewsListEl.classList.add('invisible');
-    setTimeout(() => {
+    if (fullCycle) {
+      reviewsListEl.classList.add('invisible');
+      setTimeout(() => {
+        showReviewList(paginatedReviews);
+      }, 500);
+    } else {
       showReviewList(paginatedReviews);
-    }, 500);
-  } else {
-    showReviewList(paginatedReviews);
+    }
+  } catch (e) {
+    console.error('Failed to render review list:', e);
   }
 
   if (totalReviews === 0) closeModalWindow();
 }
 
 function showReviewList(paginatedReviews) {
-  reviewsListEl.innerHTML = '';
-  paginatedReviews.forEach(el => {
-    const reviewItemNode = createReviewNode(el);
-    reviewsListEl.appendChild(reviewItemNode);
-  });
-  reviewsListEl.classList.remove('invisible');
+  try {
+    reviewsListEl.innerHTML = '';
+    paginatedReviews.forEach(el => {
+      const reviewItemNode = createReviewNode(el);
+      reviewsListEl.appendChild(reviewItemNode);
+    });
+    reviewsListEl.classList.remove('invisible');
+  } catch (e) {
+    throw new Error(`Failed to show review list: ${e.message}`);
+  }
 }
 
 function renderProductList(fullCycle = true) {
-  const products = getProducts();
-  const productArray = Object.values(products);
-  const totalProducts = productArray.length;
+  try {
+    const products = getProducts();
+    const productArray = Object.values(products);
+    const totalProducts = productArray.length;
 
-  const totalPages = Math.max(1, Math.ceil(totalProducts / productsPerPage));
-  currentProductPage = Math.min(currentProductPage, totalPages);
+    const totalPages = Math.max(1, Math.ceil(totalProducts / productsPerPage));
+    currentProductPage = Math.min(currentProductPage, totalPages);
 
-  const start = (currentProductPage - 1) * productsPerPage;
-  const end = start + productsPerPage;
-  const paginatedProducts = productArray.slice(start, end);
+    const start = (currentProductPage - 1) * productsPerPage;
+    const end = start + productsPerPage;
+    const paginatedProducts = productArray.slice(start, end);
 
-  productPaginationPageInfoEl.textContent = `Страница ${currentProductPage} из ${totalPages}`;
-  productPaginationPrevButtonEl.disabled = currentProductPage === 1;
-  productPaginationNextButtonEl.disabled = currentProductPage === totalPages;
+    productPaginationPageInfoEl.textContent = `Страница ${currentProductPage} из ${totalPages}`;
+    productPaginationPrevButtonEl.disabled = currentProductPage === 1;
+    productPaginationNextButtonEl.disabled = currentProductPage === totalPages;
 
-  if (fullCycle) {
-    productListEl.classList.add('invisible');
-    setTimeout(() => {
+    if (fullCycle) {
+      productListEl.classList.add('invisible');
+      setTimeout(() => {
+        showProductList(paginatedProducts);
+      }, 500);
+    } else {
       showProductList(paginatedProducts);
-    }, 500);
-  } else {
-    showProductList(paginatedProducts);
+    }
+  } catch (e) {
+    console.error('Failed to render product list:', e);
   }
 }
 
 function showProductList(paginatedProducts) {
-  productListEl.innerHTML = '';
-  paginatedProducts.forEach(product => {
-    const productItemEl = createProductNode(product);
-    productListEl.appendChild(productItemEl);
-  });
+  try {
+    productListEl.innerHTML = '';
+    paginatedProducts.forEach(product => {
+      const productItemEl = createProductNode(product);
+      productListEl.appendChild(productItemEl);
+    });
 
-  productListEl.classList.remove('invisible');
+    productListEl.classList.remove('invisible');
+  } catch (e) {
+    throw new Error(`Failed to show product list: ${e.message}`);
+  }
 }
 
 function handleClearAll(e) {
