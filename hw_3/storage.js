@@ -1,9 +1,13 @@
 function initializeStorage() {
-  if (!localStorage.getItem('products')) {
-    localStorage.setItem('products', JSON.stringify({}));
-  }
-  if (!localStorage.getItem('reviews')) {
-    localStorage.setItem('reviews', JSON.stringify({}));
+  try {
+    if (!localStorage.getItem('products')) {
+      localStorage.setItem('products', JSON.stringify({}));
+    }
+    if (!localStorage.getItem('reviews')) {
+      localStorage.setItem('reviews', JSON.stringify({}));
+    }
+  } catch (e) {
+    console.error('Failed to initialize storage:', e);
   }
 }
 

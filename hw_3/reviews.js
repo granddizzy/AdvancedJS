@@ -2,7 +2,8 @@ import {
   deleteReview,
   getLastProductId,
   getLastReviewId,
-  getProduct, getProductByName,
+  getProduct,
+  getProductByName,
   getReviewsByProduct,
   saveProduct,
   saveReview
@@ -24,7 +25,7 @@ import {
   reviewsTitleEl
 } from './domElements.js'
 import {state} from "./commonVariables.js";
-import {reviewPerPage, minCharCount, maxCharCount} from "./constants.js";
+import {maxCharCount, minCharCount, reviewPerPage} from "./constants.js";
 
 function handleOpenReviews(e) {
   const productEl = e.target.closest('.product');
@@ -142,40 +143,43 @@ function showReviewList(paginatedReviews) {
 }
 
 function handleDeleteReview(e) {
-  if (e.target.classList.contains('review__delete-button')) {
-    const reviewsEl = e.target.closest('.reviews');
-    const reviewEl = e.target.closest('.review');
-    if (reviewsEl && reviewEl) {
-      const productId = reviewsEl.getAttribute('data-productId');
-      const reviewId = reviewEl.getAttribute('data-id');
-      deleteReview(productId, reviewId);
-      renderReviewsList(productId, false);
-      renderProductList(false);
+  try {
+    if (e.target.classList.contains('review__delete-button')) {
+      const reviewsEl = e.target.closest('.reviews');
+      const reviewEl = e.target.closest('.review');
+      if (reviewsEl && reviewEl) {
+        const productId = reviewsEl.getAttribute('data-productId');
+        const reviewId = reviewEl.getAttribute('data-id');
+        deleteReview(productId, reviewId);
+        renderReviewsList(productId, false);
+        renderProductList(false);
+      }
     }
+  } catch (e) {
+    console.error('Failed to delete review:', e);
   }
 }
 
 function handleOpenReviewAddForm(e) {
-  reviewsContentEl.classList.add('hidden');
-  reviewAddFormEl.classList.remove('hidden');
-  reviewsTitleEl.textContent = 'Добавление отзыва'
-  reviewAddFormTextEl.value = '';
-  reviewAddFormProductEl.value = '';
-  reviewAddFormErrorsEl.value = '';
-  openModalWindow();
+  openReviewAddForm();
 }
 
 function handleOpenReviewAddFormByProduct(e) {
   const reviewsEl = e.target.closest('.reviews');
   if (reviewsEl) {
-    reviewsContentEl.classList.add('hidden');
-    reviewAddFormEl.classList.remove('hidden');
-    reviewsTitleEl.textContent = 'Добавление отзыва'
-    const product = getProduct(reviewsEl.getAttribute('data-productId'))
-    reviewAddFormTextEl.value = '';
-    reviewAddFormProductEl.value = product.name;
-    openModalWindow();
+    const product = getProduct(reviewsEl.getAttribute('data-productId'));
+    openReviewAddForm(product.name);
   }
+}
+
+function openReviewAddForm(productName = '') {
+  reviewsContentEl.classList.add('hidden');
+  reviewAddFormEl.classList.remove('hidden');
+  reviewsTitleEl.textContent = 'Добавление отзыва';
+  reviewAddFormTextEl.value = '';
+  reviewAddFormProductEl.value = productName;
+  reviewAddFormErrorsEl.value = '';
+  openModalWindow();
 }
 
 function handleCloseAddReviewForm(e) {

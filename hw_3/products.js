@@ -8,13 +8,12 @@ import {
 import {state} from "./commonVariables.js";
 import {productsPerPage} from "./constants.js";
 
-function createProductNode(product) {
+function createProductNode(product, reviewCount) {
   const productTemplateEl = document.getElementById('product-template');
   const productNode = productTemplateEl.content.cloneNode(true);
-  const productReviews = getReviewsByProduct(product.id);
   productNode.querySelector('.product').setAttribute('data-id', product.id);
   productNode.querySelector('.product__name').textContent = product.name;
-  productNode.querySelector('.product__review-count').textContent = productReviews.length;
+  productNode.querySelector('.product__review-count').textContent = reviewCount;
   return productNode;
 }
 
@@ -31,6 +30,12 @@ function renderProductList(fullCycle = true) {
     const end = start + productsPerPage;
     const paginatedProducts = productArray.slice(start, end);
 
+    // создаем объект reviewCounts содержащий количество отзывов для каждого продукта на странице
+    const reviewCounts = paginatedProducts.reduce((acc, product) => {
+      acc[product.id] = getReviewsByProduct(product.id).length;
+      return acc;
+    }, {});
+
     productPaginationPageInfoEl.textContent = `Страница ${state.currentProductPage} из ${totalPages}`;
     productPaginationPrevButtonEl.disabled = state.currentProductPage === 1;
     productPaginationNextButtonEl.disabled = state.currentProductPage === totalPages;
@@ -38,21 +43,21 @@ function renderProductList(fullCycle = true) {
     if (fullCycle) {
       productListEl.classList.add('invisible');
       setTimeout(() => {
-        showProductList(paginatedProducts);
+        showProductList(paginatedProducts, reviewCounts);
       }, 500);
     } else {
-      showProductList(paginatedProducts);
+      showProductList(paginatedProducts, reviewCounts);
     }
   } catch (e) {
     console.error('Failed to render product list:', e);
   }
 }
 
-function showProductList(paginatedProducts) {
+function showProductList(paginatedProducts, reviewCounts) {
   try {
     productListEl.innerHTML = '';
     paginatedProducts.forEach(product => {
-      const productItemEl = createProductNode(product);
+      const productItemEl = createProductNode(product, reviewCounts[product.id]);
       productListEl.appendChild(productItemEl);
     });
 

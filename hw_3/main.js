@@ -29,7 +29,7 @@ import {
   reviewsListEl
 } from "./domElements.js";
 import {closeModalWindow} from "./utils.js";
-import {getProducts, getReviewsByProduct} from "./storage.js";
+import {getProducts, getReviewsByProduct, initializeStorage} from "./storage.js";
 import {state} from "./commonVariables.js";
 import {productsPerPage, minCharCount, maxCharCount, reviewPerPage} from "./constants.js";
 
@@ -96,6 +96,7 @@ reviewsContainerEl.addEventListener('touchend', function (event) {
   handleSwipe();
 }, false);
 
+initializeStorage();
 renderProductList(false);
 
 function handleSwipe() {
