@@ -5,7 +5,8 @@ import {
   handleCloseAddReviewForm,
   handleCloseReviews,
   handleDeleteReview,
-  handleOpenReviewAddForm, handleOpenReviewAddFormByProduct,
+  handleOpenReviewAddForm,
+  handleOpenReviewAddFormByProduct,
   handleOpenReviews,
   renderReviewsList
 } from './reviews.js';
@@ -31,8 +32,7 @@ import {
 import {closeModalWindow} from "./utils.js";
 import {getProducts, getReviewsByProduct, initializeStorage} from "./storage.js";
 import {state} from "./commonVariables.js";
-import {productsPerPage, minCharCount, maxCharCount, reviewPerPage} from "./constants.js";
-
+import {maxCharCount, minCharCount, productsPerPage, reviewPerPage} from "./constants.js";
 
 productListEl.addEventListener('click', handleOpenReviews);
 reviewsCloseButtonEl.addEventListener('click', handleCloseReviews);
@@ -41,7 +41,6 @@ reviewsAddFormOpenByProductButtonEl.addEventListener('click', handleOpenReviewAd
 reviewAddFormOpenButtonEl.addEventListener('click', handleOpenReviewAddForm);
 reviewAddFormSubmitButtonEl.addEventListener('click', handleAddReview);
 reviewAddFormCancelButtonEl.addEventListener('click', handleCloseAddReviewForm);
-
 
 reviewAddFormTextEl.addEventListener('input', (e) => {
   updateCharCount(e.target.value.length);
