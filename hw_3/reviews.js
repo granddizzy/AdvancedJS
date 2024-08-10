@@ -78,7 +78,7 @@ function handleAddReview(e) {
 }
 
 function validateReview(productName, reviewText) {
-  if (productName.length < 1 || reviewText.length > 100) {
+  if (productName.length < 1 || productName.length > 100) {
     throw new Error('Название продукта должно быть от 1 до 100 символов.');
   }
   if (reviewText.length < minCharCount || reviewText.length > maxCharCount) {
