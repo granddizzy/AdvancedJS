@@ -17,9 +17,9 @@ function createProductNode(product, reviewCount) {
   return productNode;
 }
 
-function renderProductList(fullCycle = true) {
+async function renderProductList(fullCycle = true) {
   try {
-    const products = getProducts();
+    const products = await getProducts();
     const productArray = Object.values(products);
     const totalProducts = productArray.length;
 
@@ -30,11 +30,17 @@ function renderProductList(fullCycle = true) {
     const end = start + productsPerPage;
     const paginatedProducts = productArray.slice(start, end);
 
-    // создаем объект reviewCounts содержащий количество отзывов для каждого продукта на странице
-    const reviewCounts = paginatedProducts.reduce((acc, product) => {
-      acc[product.id] = getReviewsByProduct(product.id).length;
+    // Создаем объект reviewCounts с количеством отзывов по продуктам
+    // поскольку getReviewsByProduct асинхронная то и саму функцию в reduce делаю асихронной.
+    // Начальным значением передаем Promise.resolve({}) т.е. промис с пустым результатом
+    // Это нужно для того, чтобы первая итерация могла работать с объектом acc, как с промисом
+    // И в конце await paginatedProducts.reduce т.к. вернется промис с результатом
+    const reviewCounts = await paginatedProducts.reduce(async (accPromise, product) => {
+      const acc = await accPromise;
+      const reviews = await getReviewsByProduct(product.id);
+      acc[product.id] = reviews.length;
       return acc;
-    }, {});
+    }, Promise.resolve({}));
 
     productPaginationPageInfoEl.textContent = `Страница ${state.currentProductPage} из ${totalPages}`;
     productPaginationPrevButtonEl.disabled = state.currentProductPage === 1;

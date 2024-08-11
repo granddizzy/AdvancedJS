@@ -1,4 +1,4 @@
-function initializeStorage() {
+async function initializeStorage() {
   try {
     if (!localStorage.getItem('products')) {
       localStorage.setItem('products', JSON.stringify({}));
@@ -12,123 +12,129 @@ function initializeStorage() {
 }
 
 function getProducts() {
-  const jsonData = localStorage.getItem('products')
-  if (!jsonData) {
-    return {};
-  }
-
-  try {
-    return JSON.parse(jsonData);
-  } catch (e) {
-    console.error('Failed to parse reviews:', e);
-    return {};
-  }
+  // хотя localstorage это синхронная операция добавил promise для примера
+  // работы аля база данных
+  return new Promise((resolve, reject) => {
+    try {
+      const jsonData = localStorage.getItem('products');
+      if (!jsonData) {
+        resolve({});
+      } else {
+        resolve(JSON.parse(jsonData));
+      }
+    } catch (e) {
+      reject('Failed to parse products:', e);
+    }
+  });
 }
 
 function getReviews() {
-  const jsonData = localStorage.getItem('reviews')
-  if (!jsonData) {
-    return {};
-  }
-
-  try {
-    return JSON.parse(jsonData);
-  } catch (e) {
-    console.error('Failed to parse reviews:', e);
-    return {};
-  }
+  return new Promise((resolve, reject) => {
+    const jsonData = localStorage.getItem('reviews');
+    if (!jsonData) {
+      resolve({});
+    } else {
+      try {
+        resolve(JSON.parse(jsonData));
+      } catch (e) {
+        reject('Failed to parse reviews:', e);
+      }
+    }
+  });
 }
 
 function saveReview(productId, review) {
-  try {
-    let productReviews = [];
-    const reviews = getReviews();
-    if (productId in reviews) {
-      productReviews = reviews[productId];
-    }
-    productReviews.push(review)
+  return getReviews().then((reviews) => {
+    let productReviews = reviews[productId] || [];
+    productReviews.push(review);
     reviews[productId] = productReviews;
     localStorage.setItem('reviews', JSON.stringify(reviews));
-  } catch (e) {
+  }).catch((e) => {
     console.error('Failed to save review:', e);
-  }
+  });
 }
 
 function saveProduct(productId, productName) {
-  try {
-    const products = getProducts();
+  return getProducts().then((products) => {
     products[productId] = {id: productId, name: productName};
     localStorage.setItem('products', JSON.stringify(products));
     return products[productId];
-  } catch (e) {
+  }).catch((e) => {
     console.error('Failed to save product:', e);
-  }
+  });
 }
 
 function deleteProduct(productId) {
-  const products = getProducts();
-  if (products[productId]) {
-    delete products[productId];
-    localStorage.setItem('products', JSON.stringify(products));
-  }
+  return getProducts().then((products) => {
+    if (products[productId]) {
+      delete products[productId];
+      localStorage.setItem('products', JSON.stringify(products));
+    }
+  }).catch((e) => {
+    console.error('Failed to delete product:', e);
+  });
 }
 
 function deleteReview(productId, reviewId) {
-  try {
-    const reviews = getReviews();
+  return getReviews().then((reviews) => {
     if (reviews[productId]) {
       const numReviewId = parseInt(reviewId);
       const reviewIndex = reviews[productId].findIndex(review => review.id === numReviewId);
       if (reviewIndex !== -1) {
         reviews[productId].splice(reviewIndex, 1);
-        // если нет отзывов, то удаляем ключ продукта из объекта отзывов и сам продукт из объекта продуктов
         if (reviews[productId].length === 0) {
           delete reviews[productId];
-          deleteProduct(productId);
+          return deleteProduct(productId)
+            .then(() => {
+              localStorage.setItem('reviews', JSON.stringify(reviews));
+            });
         }
         localStorage.setItem('reviews', JSON.stringify(reviews));
       }
     }
-  } catch (e) {
+  }).catch((e) => {
     console.error('Failed to delete review:', e);
-  }
+  });
 }
 
 function getReviewsByProduct(productId) {
-  const reviews = getReviews();
-  if (productId in reviews) {
-    return reviews[productId];
-  }
-  return [];
+  return getReviews().then((reviews) => {
+    return reviews[productId] || [];
+  });
 }
 
 function getLastReviewId(productId) {
-  const productReviews = getReviewsByProduct(productId);
-  const ids = productReviews.map(el => el.id);
-  return ids.length > 0 ? Math.max(...ids) : 0;
+  return getReviewsByProduct(productId).then((productReviews) => {
+    const ids = productReviews.map(el => el.id);
+    return ids.length > 0 ? Math.max(...ids) : 0;
+  });
 }
 
 function getProductByName(name) {
-  const products = getProducts()
-  return Object.values(products).find(el => el.name === name);
+  return getProducts().then((products) => {
+    return Object.values(products).find(el => el.name === name);
+  });
 }
 
 function getLastProductId() {
-  const products = getProducts();
-  // превращаем все ключи-строки в числа
-  const ids = Object.keys(products).map(id => parseInt(id));
-  // находим максимальное или 0 если массив пуст
-  return ids.length > 0 ? Math.max(...ids) : 0;
+  return getProducts().then((products) => {
+    // превращаем все ключи-строки в числа
+    const ids = Object.keys(products).map(id => parseInt(id));
+    // находим максимальное или 0 если массив пуст
+    return ids.length > 0 ? Math.max(...ids) : 0;
+  });
 }
 
 function getReview(reviewId) {
-  const reviews = getReviews();
-  return reviews[reviewId];
+  return getReviews().then((reviews) => {
+    return reviews[reviewId];
+  });
 }
 
 function getProduct(productId) {
-  const products = getProducts();
-  return products[productId];
+  return getProducts().then((products) => {
+    return products[productId];
+  });
 }
 
 export {

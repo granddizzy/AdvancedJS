@@ -27,7 +27,7 @@ import {
 import {state} from "./commonVariables.js";
 import {maxCharCount, minCharCount, reviewPerPage} from "./constants.js";
 
-function handleOpenReviews(e) {
+async function handleOpenReviews(e) {
   const productEl = e.target.closest('.product');
   if (productEl) {
     const productId = productEl.getAttribute('data-id');
@@ -38,7 +38,7 @@ function handleOpenReviews(e) {
     reviewAddFormEl.classList.add('hidden');
     reviewsTitleEl.textContent = `Отзывы на ${productEl.querySelector('.product__name').textContent}`;
     openModalWindow();
-    renderReviewsList(productId, false);
+    await renderReviewsList(productId, false);
   }
 }
 
@@ -50,7 +50,7 @@ function handleCloseReviews(e) {
   }
 }
 
-function handleAddReview(e) {
+async function handleAddReview(e) {
   e.preventDefault();
 
   const productName = reviewAddFormProductEl.value;
@@ -62,19 +62,19 @@ function handleAddReview(e) {
     return;
   }
 
-  let product = getProductByName(reviewAddFormProductEl.value);
+  let product = await getProductByName(reviewAddFormProductEl.value);
   if (!product) {
-    product = saveProduct(getLastProductId() + 1, reviewAddFormProductEl.value)
+    product = await saveProduct(await getLastProductId() + 1, reviewAddFormProductEl.value)
   }
   if (product) {
-    saveReview(product.id, {
-      id: getLastReviewId(product.id) + 1,
+    await saveReview(product.id, {
+      id: await getLastReviewId(product.id) + 1,
       date: new Date(),
       text: reviewAddFormTextEl.value
     });
   }
   closeModalWindow();
-  renderProductList(false);
+  await renderProductList(false);
 }
 
 function validateReview(productName, reviewText) {
@@ -86,10 +86,10 @@ function validateReview(productName, reviewText) {
   }
 }
 
-function renderReviewsList(productId, fullCycle = true) {
+async function renderReviewsList(productId, fullCycle = true) {
   let totalReviews = 0;
   try {
-    const reviews = getReviewsByProduct(productId);
+    const reviews = await getReviewsByProduct(productId);
     const reviewsArray = Object.values(reviews);
     totalReviews = reviewsArray.length;
 
@@ -142,7 +142,7 @@ function showReviewList(paginatedReviews) {
   }
 }
 
-function handleDeleteReview(e) {
+async function handleDeleteReview(e) {
   try {
     if (e.target.classList.contains('review__delete-button')) {
       const reviewsEl = e.target.closest('.reviews');
@@ -150,9 +150,9 @@ function handleDeleteReview(e) {
       if (reviewsEl && reviewEl) {
         const productId = reviewsEl.getAttribute('data-productId');
         const reviewId = reviewEl.getAttribute('data-id');
-        deleteReview(productId, reviewId);
-        renderReviewsList(productId, false);
-        renderProductList(false);
+        await deleteReview(productId, reviewId);
+        await renderReviewsList(productId, false);
+        await renderProductList(false);
       }
     }
   } catch (e) {
@@ -164,10 +164,10 @@ function handleOpenReviewAddForm(e) {
   openReviewAddForm();
 }
 
-function handleOpenReviewAddFormByProduct(e) {
+async function handleOpenReviewAddFormByProduct(e) {
   const reviewsEl = e.target.closest('.reviews');
   if (reviewsEl) {
-    const product = getProduct(reviewsEl.getAttribute('data-productId'));
+    const product = await getProduct(reviewsEl.getAttribute('data-productId'));
     openReviewAddForm(product.name);
   }
 }
